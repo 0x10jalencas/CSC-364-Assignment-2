@@ -62,7 +62,7 @@ enum
 };
 
 /*
-Server to client response sizes.
+Server to client response sizes
 */
 enum
 {
@@ -100,7 +100,7 @@ bool chat_is_response_type(uint32_t type);
 size_t chat_request_size(uint32_t type);
 
 /*
-Client to server request builders.
+Client to server request builders
 */
 size_t chat_build_login_request(
     uint8_t *buf,
@@ -133,7 +133,7 @@ size_t chat_build_keepalive_request(
     uint8_t *buf);
 
 /*
-Server to client response builders.
+Server to client response builders
 */
 size_t chat_build_say_response(
     uint8_t *buf,
