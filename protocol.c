@@ -162,3 +162,60 @@ size_t chat_build_logout_request(uint8_t *packet)
     return build_type_request(packet, CHAT_REQ_LOGOUT);
 }
 
+size_t chat_build_join_request(
+    uint8_t *packet,
+    const char *channel)
+{
+    return build_named_request(packet, CHAT_REQ_JOIN, channel);
+}
+
+size_t chat_build_leave_request(
+    uint8_t *packet,
+    const char *channel)
+{
+    return build_named_request(packet, CHAT_REQ_LEAVE, channel);
+}
+
+size_t chat_build_say_request(
+    uint8_t *packet,
+    const char *channel,
+    const char *text)
+{
+    chat_write_u32(packet + TYPE_OFFSET, CHAT_REQ_SAY);
+    chat_write_fixed_string(packet + SAY_REQ_CHANNEL_OFFSET, channel, CHAT_NAME_SIZE);
+    chat_write_fixed_string(packet + SAY_REQ_TEXT_OFFSET, text, CHAT_TEXT_SIZE);
+
+    return CHAT_SAY_REQ_SIZE;
+}
+
+size_t chat_build_list_request(uint8_t *packet)
+{
+    return build_type_request(packet, CHAT_REQ_LIST);
+}
+
+size_t chat_build_who_request(
+    uint8_t *packet,
+    const char *channel)
+{
+    return build_named_request(packet, CHAT_REQ_WHO, channel);
+}
+
+size_t chat_build_keepalive_request(uint8_t *packet)
+{
+    return build_type_request(packet, CHAT_REQ_KEEPALIVE);
+}
+
+size_t chat_build_say_response(
+    uint8_t *packet,
+    const char *channel,
+    const char *user,
+    const char *text)
+{
+    chat_write_u32(packet + TYPE_OFFSET, CHAT_RESP_SAY);
+    chat_write_fixed_string(packet + SAY_RESP_CHANNEL_OFFSET, channel, CHAT_NAME_SIZE);
+    chat_write_fixed_string(packet + SAY_RESP_USER_OFFSET, user, CHAT_NAME_SIZE);
+    chat_write_fixed_string(packet + SAY_RESP_TEXT_OFFSET, text, CHAT_TEXT_SIZE);
+
+    return CHAT_SAY_RESP_SIZE;
+}
+
