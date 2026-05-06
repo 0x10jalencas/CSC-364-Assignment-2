@@ -219,3 +219,90 @@ size_t chat_build_say_response(
     return CHAT_SAY_RESP_SIZE;
 }
 
+size_t chat_build_error_response(
+    uint8_t *packet,
+    const char *message)
+{
+    chat_write_u32(packet + TYPE_OFFSET, CHAT_RESP_ERROR);
+    chat_write_fixed_string(packet + FIELD_OFFSET, message, CHAT_TEXT_SIZE);
+
+    return CHAT_ERROR_RESP_SIZE;
+}
+
+size_t chat_build_list_response(
+    uint8_t *packet,
+    const char channels[][CHAT_NAME_SIZE + 1],
+    uint32_t channel_count)
+{
+    chat_write_u32(packet + TYPE_OFFSET, CHAT_RESP_LIST);
+    chat_write_u32(packet + COUNT_OFFSET, channel_count);
+
+    return write_fixed_name_fields(packet, CHAT_LIST_RESP_BASE_SIZE, channels, channel_count);
+}
+
+size_t chat_build_who_response(
+    uint8_t *packet,
+    const char *channel,
+    const char users[][CHAT_NAME_SIZE + 1],
+    uint32_t user_count)
+{
+    chat_write_u32(packet + TYPE_OFFSET, CHAT_RESP_WHO);
+    chat_write_u32(packet + COUNT_OFFSET, user_count);
+    chat_write_fixed_string(packet + WHO_RESP_CHANNEL_OFFSET, channel, CHAT_NAME_SIZE);
+
+    return write_fixed_name_fields(packet, CHAT_WHO_RESP_BASE_SIZE, users, user_count);
+}
+
+static size_t bounded_strlen(const char *s, size_t limit)
+{
+    size_t len = 0;
+
+    if (s == NULL)
+    {
+        return 0;
+    }
+
+    while (len < limit && s[len] != '\0')
+    {
+        len++;
+    }
+
+    return len;
+}
+
+static size_t build_type_request(
+    uint8_t *packet,
+    uint32_t type)
+{
+    chat_write_u32(packet + TYPE_OFFSET, type);
+
+    return CHAT_U32_SIZE;
+}
+
+static size_t build_named_request(
+    uint8_t *packet,
+    uint32_t type,
+    const char *name)
+{
+    chat_write_u32(packet + TYPE_OFFSET, type);
+    chat_write_fixed_string(packet + FIELD_OFFSET, name, CHAT_NAME_SIZE);
+
+    return CHAT_U32_SIZE + CHAT_NAME_SIZE;
+}
+
+static size_t write_fixed_name_fields(
+    uint8_t *packet,
+    size_t offset,
+    const char names[][CHAT_NAME_SIZE + 1],
+    uint32_t count)
+{
+    uint32_t i;
+
+    for (i = 0; i < count; i++)
+    {
+        chat_write_fixed_string(packet + offset, names[i], CHAT_NAME_SIZE);
+        offset += CHAT_NAME_SIZE;
+    }
+
+    return offset;
+}
