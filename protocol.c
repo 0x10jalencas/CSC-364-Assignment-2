@@ -1,6 +1,6 @@
 /*
- * protocol.c implements the MustangChat packet helpers declared in protoco
- */
+protocol.c implements the MustangChat packet helpers declared in protocol.h
+*/
 
 #include "protocol.h"
 
@@ -24,8 +24,8 @@ enum
 };
 
 /*
- * Private helpers
- */
+* Private helpers
+*/
 static size_t bounded_strlen(const char *s, size_t limit);
 
 static size_t build_type_request(

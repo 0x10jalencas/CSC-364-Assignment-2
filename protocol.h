@@ -92,7 +92,7 @@ void chat_read_fixed_string(
     size_t field_size);
 
 /*
-Validation helpers.
+Validation helpers
 */
 bool chat_is_request_type(uint32_t type);
 bool chat_is_response_type(uint32_t type);
