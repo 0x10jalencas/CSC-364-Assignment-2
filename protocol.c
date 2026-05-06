@@ -43,56 +43,122 @@ static size_t write_fixed_name_fields(
     const char names[][CHAT_NAME_SIZE + 1],
     uint32_t count);
 
-static size_t bounded_strlen(const char *s, size_t limit)
+void chat_write_u32(uint8_t *packet, uint32_t value)
 {
-    size_t len = 0;
+    uint32_t network_value = htonl(value);
 
-    if (s == NULL)
+    memcpy(packet, &network_value, CHAT_U32_SIZE);
+}
+
+uint32_t chat_read_u32(const uint8_t *packet)
+{
+    uint32_t network_value = 0;
+
+    memcpy(&network_value, packet, CHAT_U32_SIZE);
+
+    return ntohl(network_value);
+}
+
+void chat_write_fixed_string(
+    uint8_t *dest,
+    const char *src,
+    size_t field_size)
+{
+    size_t len = bounded_strlen(src, field_size);
+
+    memset(dest, 0, field_size);
+
+    if (len > 0)
     {
+        memcpy(dest, src, len);
+    }
+}
+
+void chat_read_fixed_string(
+    char *dest,
+    const uint8_t *src,
+    size_t field_size)
+{
+    memcpy(dest, src, field_size);
+    dest[field_size] = '\0';
+}
+
+bool chat_is_request_type(uint32_t type)
+{
+    switch (type)
+    {
+    case CHAT_REQ_LOGIN:
+    case CHAT_REQ_LOGOUT:
+    case CHAT_REQ_JOIN:
+    case CHAT_REQ_LEAVE:
+    case CHAT_REQ_SAY:
+    case CHAT_REQ_LIST:
+    case CHAT_REQ_WHO:
+    case CHAT_REQ_KEEPALIVE:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+bool chat_is_response_type(uint32_t type)
+{
+    switch (type)
+    {
+    case CHAT_RESP_SAY:
+    case CHAT_RESP_LIST:
+    case CHAT_RESP_WHO:
+    case CHAT_RESP_ERROR:
+        return true;
+
+    default:
+        return false;
+    }
+}
+
+size_t chat_request_size(uint32_t type)
+{
+    switch (type)
+    {
+    case CHAT_REQ_LOGIN:
+        return CHAT_LOGIN_REQ_SIZE;
+
+    case CHAT_REQ_LOGOUT:
+        return CHAT_LOGOUT_REQ_SIZE;
+
+    case CHAT_REQ_JOIN:
+        return CHAT_JOIN_REQ_SIZE;
+
+    case CHAT_REQ_LEAVE:
+        return CHAT_LEAVE_REQ_SIZE;
+
+    case CHAT_REQ_SAY:
+        return CHAT_SAY_REQ_SIZE;
+
+    case CHAT_REQ_LIST:
+        return CHAT_LIST_REQ_SIZE;
+
+    case CHAT_REQ_WHO:
+        return CHAT_WHO_REQ_SIZE;
+
+    case CHAT_REQ_KEEPALIVE:
+        return CHAT_KEEPALIVE_REQ_SIZE;
+
+    default:
         return 0;
     }
-
-    while (len < limit && s[len] != '\0')
-    {
-        len++;
-    }
-
-    return len;
 }
 
-static size_t build_type_request(
+size_t chat_build_login_request(
     uint8_t *packet,
-    uint32_t type)
+    const char *user)
 {
-    chat_write_u32(packet + TYPE_OFFSET, type);
-
-    return CHAT_U32_SIZE;
+    return build_named_request(packet, CHAT_REQ_LOGIN, user);
 }
 
-static size_t build_named_request(
-    uint8_t *packet,
-    uint32_t type,
-    const char *name)
+size_t chat_build_logout_request(uint8_t *packet)
 {
-    chat_write_u32(packet + TYPE_OFFSET, type);
-    chat_write_fixed_string(packet + FIELD_OFFSET, name, CHAT_NAME_SIZE);
-
-    return CHAT_U32_SIZE + CHAT_NAME_SIZE;
+    return build_type_request(packet, CHAT_REQ_LOGOUT);
 }
 
-static size_t write_fixed_name_fields(
-    uint8_t *packet,
-    size_t offset,
-    const char names[][CHAT_NAME_SIZE + 1],
-    uint32_t count)
-{
-    uint32_t i;
-
-    for (i = 0; i < count; i++)
-    {
-        chat_write_fixed_string(packet + offset, names[i], CHAT_NAME_SIZE);
-        offset += CHAT_NAME_SIZE;
-    }
-
-    return offset;
-}
