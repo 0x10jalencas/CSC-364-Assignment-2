@@ -23,7 +23,7 @@ enum
     RECV_PACKET_SIZE = 4096,
     SEND_PACKET_SIZE = 4096,
 
-    SERVER_SWEEP_SECONDS = 120,
+    SERVER_SWEEP_SECONDS = 1,
     SERVER_TIMEOUT_SECONDS = 120,
 
     REQ_NAME_OFFSET = CHAT_U32_SIZE,
@@ -383,6 +383,7 @@ static void handle_login(
 
     if (user_index >= 0)
     {
+        chat_server_join_channel(state, user_index, "Common");
         debug_request(state, user_index, "", "login");
     }
 }
