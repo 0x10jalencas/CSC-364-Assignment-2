@@ -1,5 +1,5 @@
 /*
-protocol.c implements the MustangChat packet helpers declared in protocol.h
+protocol.c Implements the MustangChat packet helpers declared in protocol.h
 */
 
 #include "protocol.h"

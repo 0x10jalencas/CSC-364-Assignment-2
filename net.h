@@ -1,5 +1,5 @@
 /*
-net.h declares the UDP socket and address helpers used by the MustangChat client
+net.h Declares the UDP socket and address helpers used by the MustangChat client
 and server.
 
 Because the assignment asks to uses UDP instead of TCP, I keep socket creation +
