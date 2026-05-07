@@ -1,7 +1,7 @@
 /*
- client_state.h Declares the local state helpers shared by the MustangChat
- client. I track joined channels and the active channel. So commands like /join,
- /leave, and /switch can be handled (outside) the main client loop.
+client_state.h Declares the local state helpers shared by the MustangChat
+client. I track joined channels and the active channel. So commands like /join,
+/leave, and /switch can be handled (outside) the main client loop.
  */
 
 #ifndef CHAT_CLIENT_STATE_H
